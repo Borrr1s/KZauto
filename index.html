@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>Парк авто — школа дрифта</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f5f5f3;--card:#fff;--tx:#1c1c1a;--mu:#6b6b66;--bd:#e0e0da;--ok:#1d9e75;--okbg:#e1f5ee;--wr:#c47f0a;--wrbg:#faeeda;--er:#d04a3a;--erbg:#fcebeb;--ac:#2f6fd6;--bl:#2f6fd6;--blbg:#e3edfb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bl:#7fb0ff;--blbg:#12284d;--bg:#171716;--card:#232321;--tx:#f0efe9;--mu:#9a9a92;--bd:#38382f;--ok:#5dcaa5;--okbg:#0f3b2e;--wr:#efb54a;--wrbg:#42300b;--er:#f08a7c;--erbg:#4a1f1a;--ac:#6ea0f0}}
+:root[data-theme="dark"]{--bl:#7fb0ff;--blbg:#12284d;--bg:#171716;--card:#232321;--tx:#f0efe9;--mu:#9a9a92;--bd:#38382f;--ok:#5dcaa5;--okbg:#0f3b2e;--wr:#efb54a;--wrbg:#42300b;--er:#f08a7c;--erbg:#4a1f1a;--ac:#6ea0f0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0 0 4px}.mu{color:var(--mu);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:14px 0}
+.site{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer}
+.site.on{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
+.site b{font-size:16px}.nums{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.pill{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--bd)}
+.pill.ok{background:var(--okbg);color:var(--ok)}.pill.wr{background:var(--wrbg);color:var(--wr)}.pill.er{background:var(--erbg);color:var(--er)}
+.bar{height:6px;border-radius:3px;background:var(--bd);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,input,select{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:7px 10px}
+button{cursor:pointer}button.pr{background:var(--ac);color:#fff;border-color:var(--ac)}button.x{padding:2px 8px;color:var(--mu)}
+.car{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+.car h3{margin:0;font-size:16px}.tasks{margin:8px 0 0;padding:0;list-style:none}
+.tasks li{display:flex;gap:8px;align-items:center;padding:5px 0;border-top:1px solid var(--bd)}
+.tasks li.d span{text-decoration:line-through;color:var(--mu)}
+.tag{font-size:11px;padding:1px 7px;border-radius:6px;background:var(--bd)}
+.tag.repair,.ddb.repair,.opt.repair{background:var(--erbg);color:var(--er)}.tag.tires,.tag.fuel,.ddb.tires,.ddb.fuel,.opt.tires,.opt.fuel{background:var(--blbg);color:var(--bl)}.tag.task,.ddb.task,.opt.task{background:var(--wrbg);color:var(--wr)}
+.dd{position:relative}.ddb{font-weight:600}.ddm{position:absolute;z-index:5;top:100%;left:0;margin-top:4px;min-width:150px;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:4px}.ddm[hidden]{display:none}.opt{padding:7px 10px;border-radius:6px;cursor:pointer;margin:2px 0;font-weight:600}
+.add{background:var(--card);border:1px dashed var(--bd);border-radius:12px;padding:12px;margin:14px 0}
+#note{background:var(--wrbg);color:var(--wr);padding:8px 12px;border-radius:8px;margin-bottom:10px;display:none}
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.grow{flex:1;min-width:120px}
+#lock{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:50}#lock[hidden]{display:none}.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
+</style></head><body><main>
+<div id="note"></div>
+<div id="lock" hidden><div class="box"><h1>Парк авто</h1><div class="mu" style="margin-bottom:10px">Введите PIN-код</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN"> <button id="go" class="pr">Войти</button><div id="err" style="color:var(--er);margin-top:8px"></div></div></div>
+<div class="head"><div><h1>Парк авто · школа дрифта</h1><div class="mu">Где машина, что с ней нужно сделать, что готово</div></div>
+<div class="row"><button id="addBtn" class="pr">+ Машина</button><button id="out">Выйти</button></div></div>
+<div class="grid" id="sites"></div>
+<div class="add" id="form" hidden>
+ <div class="row"><input id="fName" class="grow" placeholder="Название (напр. BMW E36 №3)"><input id="fPlate" placeholder="Номер / ID" style="width:130px"></div>
+ <div class="row" style="margin-top:8px"><input id="fCity" class="grow" list="cities" placeholder="Город / площадка"><datalist id="cities"></datalist>
+ <button id="save" class="pr">Сохранить</button><button id="cancel">Отмена</button></div>
+</div>
+<div class="row" style="margin-bottom:10px"><select id="flt"><option value="all">Все</option><option value="todo">Требуют работ</option><option value="ready">Готовы</option></select><span class="mu" id="cnt"></span></div>
+<div id="list"></div>
+</main>
+<script>
+const API="ВСТАВЬТЕ_СЮДА_URL_ВЕБ-ПРИЛОЖЕНИЯ_APPS_SCRIPT";
+let cars=[],city=null,pin=null,busy=0,last="",timer=null;
+try{pin=localStorage.getItem("pin")}catch(e){}
+const $=id=>document.getElementById(id);
+const TYPES={repair:"Ремонт",tires:"Колёса",fuel:"Топливо",task:"Задача"};
+const sel={};
+const dd=id=>{const t=sel[id]||"repair";return `<div class="dd"><button class="ddb ${t}" data-ddb>${TYPES[t]} ▾</button><div class="ddm" hidden>${Object.keys(TYPES).map(k=>`<div class="opt ${k}" data-opt="${k}">${TYPES[k]}</div>`).join("")}</div></div>`};
+const open=c=>(c.tasks||[]).filter(t=>!t.done);
+const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const uid=()=>"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+
+async function api(action,data={}){
+ const r=await fetch(API,{method:"POST",body:JSON.stringify({pin,action,...data})});
+ const j=await r.json();
+ if(!j.ok){if(j.error==="pin")logout("Неверный PIN");throw new Error(j.error)}
+ return j;
+}
+function setNote(t){const n=$("note");n.textContent=t||"";n.style.display=t?"block":"none"}
+function logout(msg){pin=null;try{localStorage.removeItem("pin")}catch(e){}clearInterval(timer);timer=null;$("err").textContent=msg||"";$("pin").value="";$("lock").hidden=false}
+async function save(c){
+ const i=cars.findIndex(x=>x.id===c.id);i<0?cars.push(c):cars[i]=c;render();busy++;
+ try{await api("save",{car:c});setNote("")}catch(e){setNote("Не удалось сохранить — проверьте соединение")}finally{busy--}
+}
+async function del(id){
+ cars=cars.filter(c=>c.id!==id);render();busy++;
+ try{await api("delete",{id});setNote("")}catch(e){setNote("Не удалось удалить — проверьте соединение")}finally{busy--}
+}
+async function load(){
+ try{const j=await api("list"),t=JSON.stringify(j.cars),ae=document.activeElement;
+  if(!busy&&t!==last&&!(ae&&/INPUT|SELECT/.test(ae.tagName)&&ae.type!=="checkbox")){cars=j.cars;last=t;render()}setNote("")}
+ catch(e){if(e.message!=="pin")setNote("Нет связи с таблицей…")}
+}
+function start(){$("lock").hidden=true;load();if(!timer)timer=setInterval(load,15000)}
+$("go").onclick=async()=>{
+ pin=$("pin").value.trim();$("err").textContent="";
+ try{await api("list");try{localStorage.setItem("pin",pin)}catch(e){}start()}
+ catch(e){if(e.message!=="pin")$("err").textContent="Нет связи с таблицей"}
+};
+$("pin").onkeydown=e=>{if(e.key==="Enter")$("go").click()};
+$("out").onclick=()=>logout("");
+function render(){
+ const cs=[...new Set(cars.map(c=>c.city))].sort();
+ if(city&&!cs.includes(city))city=null;
+ $("cities").innerHTML=cs.map(c=>`<option value="${esc(c)}">`).join("");
+ const tot=cars.length,rd=cars.filter(c=>!open(c).length).length;
+ const card=(k,name,n,r)=>`<div class="site ${city===k?"on":""}" data-c="${esc(k||"")}"><b>${esc(name)}</b><div class="nums"><span class="pill">${n} машин</span><span class="pill ok">${r} готово</span><span class="pill wr">${n-r} в работе</span></div><div class="bar"><i style="width:${n?r/n*100:0}%"></i></div></div>`;
+ $("sites").innerHTML=cs.length?card(null,"Все площадки",tot,rd)+cs.map(s=>{const a=cars.filter(c=>c.city===s);return card(s,s,a.length,a.filter(c=>!open(c).length).length)}).join(""):`<div class="mu">Пока нет машин. Нажмите «+ Машина».</div>`;
+ let v=cars.filter(c=>!city||c.city===city);
+ const f=$("flt").value;
+ if(f==="todo")v=v.filter(c=>open(c).length);if(f==="ready")v=v.filter(c=>!open(c).length);
+ $("cnt").textContent=v.length+" шт.";
+ $("list").innerHTML=v.sort((a,b)=>open(b).length-open(a).length).map(c=>{
+  const o=open(c).length;
+  return `<div class="car" data-id="${c.id}"><div class="head"><div><h3>${esc(c.name)} <span class="mu">${esc(c.plate)}</span></h3><div class="mu">📍 ${esc(c.city)}</div></div>
+  <div class="row"><span class="pill ${o?"wr":"ok"}">${o?o+" задач":"Готова"}</span><button class="x" data-del>Удалить</button></div></div>
+  <ul class="tasks">${(c.tasks||[]).map((t,i)=>`<li class="${t.done?"d":""}"><input type="checkbox" data-t="${i}" ${t.done?"checked":""}><span class="tag ${t.type}">${TYPES[t.type]}</span><span class="grow">${esc(t.text)}</span><button class="x" data-rt="${i}">×</button></li>`).join("")}</ul>
+  <div class="row" style="margin-top:8px">${dd(c.id)}<input class="grow" data-tx placeholder="Что сделать (напр. замена ШРУСа, залить 40 л)"><button data-add>Добавить</button></div></div>`}).join("");
+}
+$("sites").onclick=e=>{const s=e.target.closest(".site");if(!s)return;city=s.dataset.c||null;render()};
+document.addEventListener("click",e=>{if(!e.target.closest(".dd"))document.querySelectorAll(".ddm").forEach(m=>m.hidden=true)});
+$("flt").onchange=render;
+$("addBtn").onclick=()=>{$("form").hidden=false;$("fCity").value=city||"";$("fName").focus()};
+$("cancel").onclick=()=>$("form").hidden=true;
+$("save").onclick=()=>{
+ const name=$("fName").value.trim(),c=$("fCity").value.trim();
+ if(!name||!c){alert("Укажите название и город");return}
+ save({id:uid(),name,plate:$("fPlate").value.trim(),city:c,tasks:[]});
+ ["fName","fPlate"].forEach(i=>$(i).value="");$("form").hidden=true;
+};
+$("list").onclick=e=>{
+ const el=e.target.closest(".car");if(!el)return;
+ const c=cars.find(x=>x.id===el.dataset.id);if(!c)return;
+ const n={...c,tasks:[...(c.tasks||[])]};
+ const b=e.target.closest("[data-ddb]"),o=e.target.closest("[data-opt]");
+ if(b){const m=el.querySelector(".ddm");m.hidden=!m.hidden;return}
+ if(o){sel[c.id]=o.dataset.opt;const bt=el.querySelector("[data-ddb]");bt.className="ddb "+o.dataset.opt;bt.textContent=TYPES[o.dataset.opt]+" ▾";el.querySelector(".ddm").hidden=true;return}
+ if(e.target.dataset.del!==undefined){if(confirm("Удалить машину «"+c.name+"»?"))del(c.id);return}
+ if(e.target.dataset.rt!==undefined){n.tasks.splice(+e.target.dataset.rt,1);save(n);return}
+ if(e.target.dataset.add!==undefined){
+  const tx=el.querySelector("[data-tx]").value.trim();if(!tx)return;
+  n.tasks.push({type:sel[c.id]||"repair",text:tx,done:false});save(n);return}
+};
+$("list").onchange=e=>{
+ if(e.target.dataset.t===undefined)return;
+ const el=e.target.closest(".car"),c=cars.find(x=>x.id===el.dataset.id);
+ const n={...c,tasks:c.tasks.map((t,i)=>i==e.target.dataset.t?{...t,done:e.target.checked}:t)};save(n);
+};
+render();if(pin)start();else $("lock").hidden=false;
+</script></body></html>
