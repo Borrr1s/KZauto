@@ -2,49 +2,124 @@
 <html lang="ru"><head><meta charset="utf-8"><title>Парк авто — школа дрифта</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
-:root{--bg:#f5f5f3;--card:#fff;--tx:#1c1c1a;--mu:#6b6b66;--bd:#e0e0da;--ok:#1d9e75;--okbg:#e1f5ee;--wr:#c47f0a;--wrbg:#faeeda;--er:#d04a3a;--erbg:#fcebeb;--ac:#2f6fd6;--bl:#2f6fd6;--blbg:#e3edfb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bl:#7fb0ff;--blbg:#12284d;--bg:#171716;--card:#232321;--tx:#f0efe9;--mu:#9a9a92;--bd:#38382f;--ok:#5dcaa5;--okbg:#0f3b2e;--wr:#efb54a;--wrbg:#42300b;--er:#f08a7c;--erbg:#4a1f1a;--ac:#6ea0f0}}
-:root[data-theme="dark"]{--bl:#7fb0ff;--blbg:#12284d;--bg:#171716;--card:#232321;--tx:#f0efe9;--mu:#9a9a92;--bd:#38382f;--ok:#5dcaa5;--okbg:#0f3b2e;--wr:#efb54a;--wrbg:#42300b;--er:#f08a7c;--erbg:#4a1f1a;--ac:#6ea0f0}
+:root{
+  --bg:#111213;
+  --bg-2:#191a1c;
+  --card:#1b1c1e;
+  --card-2:#222426;
+  --tx:#f5f5f5;
+  --mu:#aeb1b4;
+  --bd:rgba(255,255,255,.1);
+  --ok:#3cd39b;
+  --okbg:rgba(60,211,155,.12);
+  --wr:#ffb648;
+  --wrbg:rgba(255,182,72,.12);
+  --er:#ff6d63;
+  --erbg:rgba(255,109,99,.12);
+  --ac:#e21b24;
+  --ac-2:#f0443e;
+  --bl:#79baff;
+  --blbg:rgba(35,126,230,.24);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:980px;margin:0 auto;padding:16px}
-h1{font-size:20px;margin:0 0 4px}.mu{color:var(--mu);font-size:13px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:14px 0}
-.site{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer}
-.site.on{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
-.site b{font-size:16px}.nums{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.pill{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--bd)}
-.pill.ok{background:var(--okbg);color:var(--ok)}.pill.wr{background:var(--wrbg);color:var(--wr)}.pill.er{background:var(--erbg);color:var(--er)}
-.bar{height:6px;border-radius:3px;background:var(--bd);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-button,input,select{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:7px 10px}
-button{cursor:pointer}button.pr{background:var(--ac);color:#fff;border-color:var(--ac)}button.x{padding:2px 8px;color:var(--mu)}
-.car{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
-.car h3{margin:0;font-size:16px}.tasks{margin:8px 0 0;padding:0;list-style:none}
-.tasks li{display:flex;gap:8px;align-items:center;padding:5px 0;border-top:1px solid var(--bd)}
-.tasks li.d span{text-decoration:line-through;color:var(--mu)}
-.tag{font-size:11px;padding:1px 7px;border-radius:6px;background:var(--bd)}
-.tag.repair,.ddb.repair,.opt.repair{background:var(--erbg);color:var(--er)}.tag.tires,.tag.fuel,.ddb.tires,.ddb.fuel,.opt.tires,.opt.fuel{background:var(--blbg);color:var(--bl)}.tag.task,.ddb.task,.opt.task{background:var(--wrbg);color:var(--wr)}
-.dd{position:relative}.ddb{font-weight:600}.ddm{position:absolute;z-index:5;top:100%;left:0;margin-top:4px;min-width:150px;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:4px}.ddm[hidden]{display:none}.opt{padding:7px 10px;border-radius:6px;cursor:pointer;margin:2px 0;font-weight:600}
-.add{background:var(--card);border:1px dashed var(--bd);border-radius:12px;padding:12px;margin:14px 0}
-#note{background:var(--wrbg);color:var(--wr);padding:8px 12px;border-radius:8px;margin-bottom:10px;display:none}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#18191b 0,var(--bg) 390px);color:var(--tx);font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif}
+.page-shell{max-width:1240px;margin:0 auto;padding:24px 22px 52px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;background:linear-gradient(110deg,#202123,var(--card) 55%);border:1px solid var(--bd);border-left:4px solid var(--ac);border-radius:11px;box-shadow:0 10px 26px rgba(0,0,0,.2)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:8px;background:var(--ac);color:#fff;font-weight:900;font-size:17px}
+.brand strong{display:block;font-size:1.05rem;letter-spacing:.02em}
+.brand small{display:block;color:var(--mu)}
+.hero{margin-top:16px;padding:24px;background:linear-gradient(112deg,rgba(226,27,36,.1),transparent 48%),linear-gradient(180deg,#202123,var(--card));border:1px solid rgba(255,255,255,.12);border-top:2px solid var(--ac);border-radius:12px;display:grid;grid-template-columns:1.7fr .9fr;gap:22px;align-items:center;box-shadow:0 16px 36px rgba(0,0,0,.2)}
+.hero-copy h1{margin:0 0 12px;font-size:46px;line-height:1.08;letter-spacing:0}
+.hero-copy .kicker{display:inline-block;color:#ff8588;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:11px;margin-bottom:10px}
+.hero-copy p{margin:0 0 18px;color:var(--mu);font-size:1.02rem;max-width:640px}
+.hero-actions,.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button,input,select{font:inherit;color:var(--tx);background:rgba(255,255,255,.025);border:1px solid var(--bd);border-radius:8px;padding:9px 11px;transition:.15s ease}
+button{cursor:pointer}.button-ghost{background:rgba(255,255,255,.03)}
+button.pr{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700;box-shadow:0 5px 14px rgba(225,27,36,.22)}
+button.x{padding:5px 8px;color:var(--mu);background:transparent;border-color:var(--bd)}
+.hero-stat{background:linear-gradient(145deg,#242527,var(--bg-2));border:1px solid rgba(255,255,255,.1);border-left:3px solid var(--ac);border-radius:10px;padding:18px 20px;box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.hero-stat strong{display:block;font-size:38px;line-height:1;margin:0 0 9px;font-weight:800}
+.hero-stat span{color:var(--mu)}
+main{max-width:1200px;margin:24px auto 0;padding:0}
+h1{font-size:22px;margin:0 0 4px}.mu{color:var(--mu);font-size:13px}
+.head h1{border-left:3px solid var(--ac);padding-left:10px;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin:16px 0 20px}
+.site{background:linear-gradient(150deg,#202123,var(--card) 72%);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:15px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.16);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.site:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.2);box-shadow:0 12px 26px rgba(0,0,0,.23)}
+.site.on{border-color:var(--ac);box-shadow:inset 3px 0 0 var(--ac),0 8px 22px rgba(0,0,0,.2)}
+.site b{font-size:16px;display:block;margin-bottom:10px}.site-total{margin-bottom:9px}.nums{display:flex;gap:7px;flex-wrap:wrap}
+.pill{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.04);color:var(--tx);border:1px solid var(--bd)}
+.pill.ok{background:var(--okbg);color:var(--ok);border-color:rgba(60,211,155,.2)}.pill.wr{background:var(--wrbg);color:var(--wr);border-color:rgba(255,182,72,.2)}.pill.er{background:var(--erbg);color:var(--er);border-color:rgba(255,109,99,.2)}
+.bar{height:7px;border-radius:999px;background:rgba(255,255,255,.05);margin-top:10px;overflow:hidden;border:1px solid var(--bd)}.bar i{display:block;height:100%;background:var(--ac)}
+.add{background:var(--card);border:1px dashed rgba(255,255,255,.16);border-radius:9px;padding:14px;margin:16px 0}
+#note{background:var(--wrbg);color:var(--wr);padding:10px 12px;border-radius:12px;margin-bottom:12px;border:1px solid rgba(255,182,72,.25);display:none}
 .head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .grow{flex:1;min-width:120px}
-#lock{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:50}#lock[hidden]{display:none}.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
-</style></head><body><main>
-<div id="note"></div>
-<div id="lock" hidden><div class="box"><h1>Парк авто</h1><div class="mu" style="margin-bottom:10px">Введите PIN-код</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN"> <button id="go" class="pr">Войти</button><div id="err" style="color:var(--er);margin-top:8px"></div></div></div>
-<div class="head"><div><h1>Парк авто · школа дрифта</h1><div class="mu">Где машина, что с ней нужно сделать, что готово</div></div>
-<div class="row"><button id="addBtn" class="pr">+ Машина</button><button id="out">Выйти</button></div></div>
-<div class="grid" id="sites"></div>
-<div class="add" id="form" hidden>
- <div class="row"><input id="fName" class="grow" placeholder="Название (напр. BMW E36 №3)"><input id="fPlate" placeholder="Номер / ID" style="width:130px"></div>
- <div class="row" style="margin-top:8px"><input id="fCity" class="grow" list="cities" placeholder="Город / площадка"><datalist id="cities"></datalist>
- <button id="save" class="pr">Сохранить</button><button id="cancel">Отмена</button></div>
+#lock{position:fixed;inset:0;background:rgba(10,10,10,.8);display:flex;align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(4px)}#lock[hidden]{display:none}.box{background:var(--card);border:1px solid var(--bd);border-top:3px solid var(--ac);border-radius:12px;padding:24px 22px;text-align:center;min-width:min(94vw,360px);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.box h1{margin-bottom:10px;font-size:26px}
+#err{color:var(--er);margin-top:12px;min-height:18px}
+.car{background:linear-gradient(150deg,#202123,var(--card) 60%);border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:15px;margin-bottom:13px;box-shadow:0 8px 22px rgba(0,0,0,.17);transition:border-color .16s ease,box-shadow .16s ease}
+.car:hover{border-color:rgba(255,255,255,.17);box-shadow:0 11px 26px rgba(0,0,0,.22)}
+.car h3{margin:0;font-size:18px;font-weight:700}.tasks{margin:10px 0 0;padding:0;list-style:none}
+.tasks li{display:flex;gap:10px;align-items:center;padding:9px 5px;border-top:1px solid rgba(255,255,255,.075);transition:background .15s ease}
+.tasks li:hover{background:rgba(255,255,255,.025)}
+.tasks li.d span{text-decoration:line-through;color:var(--mu)}
+.tag{font-size:11px;padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.05);border:1px solid var(--bd);font-weight:700}
+.tag.repair,.ddb.repair,.opt.repair{background:rgba(255,72,77,.3);color:#ff9a9d;border-color:rgba(255,90,95,.52)}.tag.tires,.tag.fuel,.ddb.tires,.ddb.fuel,.opt.tires,.opt.fuel{background:var(--blbg);color:var(--bl);border-color:rgba(75,157,255,.55)}.tag.task,.ddb.task,.opt.task{background:rgba(255,182,72,.26);color:#ffd078;border-color:rgba(255,182,72,.48)}
+.dd{position:relative}.ddb{font-weight:700;min-width:140px}.ddm{position:absolute;z-index:5;top:100%;left:0;margin-top:6px;min-width:160px;background:var(--card-2);border:1px solid var(--bd);border-radius:8px;padding:5px;box-shadow:0 12px 20px rgba(0,0,0,.25)}.ddm[hidden]{display:none}.opt{padding:8px 10px;border-radius:6px;cursor:pointer;margin:2px 0;font-weight:700;border:1px solid transparent}
+select{min-width:170px}
+input:focus,select:focus,button:focus{outline:none;border-color:rgba(225,32,39,.9);box-shadow:0 0 0 3px rgba(225,32,39,.2)}
+@media (max-width: 720px){.page-shell{padding:14px 12px 32px}.topbar,.hero{border-radius:11px}.topbar{padding:12px 14px}.hero{grid-template-columns:1fr;padding:18px 16px;gap:16px}.hero-copy h1{font-size:34px}.hero-stat{padding:14px 16px}.main-shell{padding:0}.}
+</style></head><body>
+<div class="page-shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">КЗ</div>
+      <div>
+        <strong>Культура Заноса</strong>
+        <small>Внутреннее приложение · Санкт-Петербург</small>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="kicker">Управление автопарком</div>
+      <h1>Автомобили<br>и обслуживание</h1>
+      <p>Состояние машин, площадок и текущих задач обслуживания.</p>
+      <div class="hero-actions">
+        <button id="addBtn" class="pr">+ Добавить машину</button>
+        <button id="out" class="button-ghost">Выйти</button>
+      </div>
+    </div>
+    <div class="hero-stat">
+      <strong id="heroCounter">0</strong>
+      <span>автомобилей в автопарке</span>
+    </div>
+  </section>
+
+  <main>
+    <div id="note"></div>
+    <div id="lock" hidden><div class="box"><h1>Парк авто</h1><div class="mu" style="margin-bottom:10px">Введите PIN-код</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" placeholder="PIN"> <button id="go" class="pr">Войти</button><div id="err" style="color:var(--er);margin-top:8px"></div></div></div>
+    <div class="head"><div><h1>Автопарк</h1></div></div>
+    <div class="grid" id="sites"></div>
+    <div class="add" id="form" hidden>
+     <div class="row"><input id="fName" class="grow" placeholder="Название (напр. BMW E36 №3)"><input id="fPlate" placeholder="Номер / ID" style="width:130px"></div>
+     <div class="row" style="margin-top:8px"><input id="fCity" class="grow" list="cities" placeholder="Город / площадка"><datalist id="cities"></datalist>
+     <button id="save" class="pr">Сохранить</button><button id="cancel">Отмена</button></div>
+    </div>
+    <div class="row" style="margin-bottom:10px"><select id="flt"><option value="all">Все</option><option value="todo">Требуют работ</option><option value="ready">Готовы</option></select><span class="mu" id="cnt"></span></div>
+    <div id="list"></div>
+  </main>
 </div>
-<div class="row" style="margin-bottom:10px"><select id="flt"><option value="all">Все</option><option value="todo">Требуют работ</option><option value="ready">Готовы</option></select><span class="mu" id="cnt"></span></div>
-<div id="list"></div>
-</main>
+<script>
+const heroCounter = document.getElementById('heroCounter');
+function updateHeroCounter(count){ heroCounter.textContent = count; }
+</script>
 <script>
 const API="https://script.google.com/macros/s/AKfycbwLTjFTkAwOE-2s99CsbaHzMPZYnro0ajZIWDjtaBgfMvNkRb10VLarLS78z8PR682hbQ/exec";
 let cars=[],city=null,pin=null,busy=0,last="",timer=null;
@@ -91,8 +166,14 @@ function render(){
  if(city&&!cs.includes(city))city=null;
  $("cities").innerHTML=cs.map(c=>`<option value="${esc(c)}">`).join("");
  const tot=cars.length,rd=cars.filter(c=>!open(c).length).length;
- const card=(k,name,n,r)=>`<div class="site ${city===k?"on":""}" data-c="${esc(k||"")}"><b>${esc(name)}</b><div class="nums"><span class="pill">${n} машин</span><span class="pill ok">${r} готово</span><span class="pill wr">${n-r} в работе</span></div><div class="bar"><i style="width:${n?r/n*100:0}%"></i></div></div>`;
- $("sites").innerHTML=cs.length?card(null,"Все площадки",tot,rd)+cs.map(s=>{const a=cars.filter(c=>c.city===s);return card(s,s,a.length,a.filter(c=>!open(c).length).length)}).join(""):`<div class="mu">Пока нет машин. Нажмите «+ Машина».</div>`;
+ updateHeroCounter(tot);
+ const card=(k,name,group)=>{
+  const repair=group.filter(c=>open(c).some(t=>t.type==="repair"));
+  const repairIds=new Set(repair.map(c=>c.id));
+  const work=group.filter(c=>!repairIds.has(c.id)&&open(c).some(t=>t.type==="task"||t.type==="tires"||t.type==="fuel")).length;
+  return `<div class="site ${city===k?"on":""}" data-c="${esc(k||"")}"><b>${esc(name)}</b><div class="site-total"><span class="pill">${group.length} машин</span></div><div class="nums"><span class="pill wr">${work} в работе</span><span class="pill er">${repair.length} требуют ремонта</span></div></div>`;
+ };
+ $("sites").innerHTML=cs.length?card(null,"Все площадки",cars)+cs.map(s=>card(s,s,cars.filter(c=>c.city===s))).join(""):`<div class="mu">Пока нет машин. Нажмите «+ Машина».</div>`;
  let v=cars.filter(c=>!city||c.city===city);
  const f=$("flt").value;
  if(f==="todo")v=v.filter(c=>open(c).length);if(f==="ready")v=v.filter(c=>!open(c).length);
