@@ -59,11 +59,15 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&g
 const uid=()=>"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 
 async function api(action,data={}){
- const r=await fetch(API,{method:"POST",body:JSON.stringify({pin,action,...data})});
- const j=await r.json();
+ if(!/^https:\/\/script\.google(usercontent)?\.com\/.*\/exec/.test(API))throw new Error("url");
+ let r,j;
+ try{r=await fetch(API,{method:"POST",body:JSON.stringify({pin,action,...data})})}catch(e){throw new Error("net")}
+ try{j=await r.json()}catch(e){throw new Error("html")}
  if(!j.ok){if(j.error==="pin")logout("Неверный PIN");throw new Error(j.error)}
  return j;
 }
+const WHY={url:"В константе API нет правильного URL (он должен начинаться с https://script.google.com и заканчиваться на /exec)",net:"Запрос не дошёл до скрипта: проверьте интернет и URL в константе API",html:"Скрипт вернул не данные: в развёртывании нужен доступ «Все», запуск «от меня», и нужно один раз подтвердить разрешения"};
+const why=e=>WHY[e.message]||("Ошибка скрипта: "+e.message);
 function setNote(t){const n=$("note");n.textContent=t||"";n.style.display=t?"block":"none"}
 function logout(msg){pin=null;try{localStorage.removeItem("pin")}catch(e){}clearInterval(timer);timer=null;$("err").textContent=msg||"";$("pin").value="";$("lock").hidden=false}
 async function save(c){
@@ -77,13 +81,13 @@ async function del(id){
 async function load(){
  try{const j=await api("list"),t=JSON.stringify([j.cars,j.sites]),ae=document.activeElement;
   if(!busy&&t!==last&&!(ae&&/INPUT|SELECT/.test(ae.tagName)&&ae.type!=="checkbox")){cars=j.cars;sites=j.sites||[];last=t;render()}setNote("")}
- catch(e){if(e.message!=="pin")setNote("Нет связи с таблицей…")}
+ catch(e){if(e.message!=="pin")setNote(why(e))}
 }
 function start(){$("lock").hidden=true;load();if(!timer)timer=setInterval(load,15000)}
 $("go").onclick=async()=>{
  pin=$("pin").value.trim();$("err").textContent="";
  try{await api("list");try{localStorage.setItem("pin",pin)}catch(e){}start()}
- catch(e){if(e.message!=="pin")$("err").textContent="Нет связи с таблицей"}
+ catch(e){if(e.message!=="pin")$("err").textContent=why(e)}
 };
 $("pin").onkeydown=e=>{if(e.key==="Enter")$("go").click()};
 $("out").onclick=()=>logout("");
