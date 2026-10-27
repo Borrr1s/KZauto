@@ -57,7 +57,7 @@ button{cursor:pointer}button.pr{background:var(--ac);color:#fff;border-color:var
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const SB_URL="https://iymxeqfltaktixditaph.supabase.co/rest/v1/",SB_KEY="sb_publishable_oeJHCI-EDlGFdO4_dyJA7g_qxcR55R7";
+const SB_URL="https://iymxeqfltaktixditaph.supabase.co/auth/v1/oauth/authorize",SB_KEY="sb_publishable_oeJHCI-EDlGFdO4_dyJA7g_qxcR55R7";
 const sb=supabase.createClient(SB_URL,SB_KEY);
 let me=null,sites=[],cars=[],tasks=[],people=[],tr=[],city=null,timer=null;const logs={},openLog={},sel={};
 const $=id=>document.getElementById(id);
