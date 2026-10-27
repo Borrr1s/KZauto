@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><title>Парк авто — школа дрифта</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+
+:root{--bg:#f5f5f3;--card:#fff;--tx:#1c1c1a;--mu:#6b6b66;--bd:#e0e0da;--ok:#1d9e75;--okbg:#e1f5ee;--wr:#c47f0a;--wrbg:#faeeda;--er:#d04a3a;--erbg:#fcebeb;--ac:#2f6fd6;--bl:#2f6fd6;--blbg:#e3edfb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bl:#7fb0ff;--blbg:#12284d;--bg:#171716;--card:#232321;--tx:#f0efe9;--mu:#9a9a92;--bd:#38382f;--ok:#5dcaa5;--okbg:#0f3b2e;--wr:#efb54a;--wrbg:#42300b;--er:#f08a7c;--erbg:#4a1f1a;--ac:#6ea0f0}}
+:root[data-theme="dark"]{--bl:#7fb0ff;--blbg:#12284d;--bg:#171716;--card:#232321;--tx:#f0efe9;--mu:#9a9a92;--bd:#38382f;--ok:#5dcaa5;--okbg:#0f3b2e;--wr:#efb54a;--wrbg:#42300b;--er:#f08a7c;--erbg:#4a1f1a;--ac:#6ea0f0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:0 0 4px}.mu{color:var(--mu);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:14px 0}
+.site{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer}
+.site.on{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}
+.site b{font-size:16px}.nums{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.pill{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--bd)}
+.pill.ok{background:var(--okbg);color:var(--ok)}.pill.wr{background:var(--wrbg);color:var(--wr)}.pill.er{background:var(--erbg);color:var(--er)}
+.bar{height:6px;border-radius:3px;background:var(--bd);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,input,select{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:7px 10px}
+button{cursor:pointer}button.pr{background:var(--ac);color:#fff;border-color:var(--ac)}button.x{padding:2px 8px;color:var(--mu)}
+.car{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+.car h3{margin:0;font-size:16px}.tasks{margin:8px 0 0;padding:0;list-style:none}
+.tasks li{display:flex;gap:8px;align-items:center;padding:5px 0;border-top:1px solid var(--bd)}
+.tasks li.d span{text-decoration:line-through;color:var(--mu)}
+.tag{font-size:11px;padding:1px 7px;border-radius:6px;background:var(--bd)}
+.tag.repair,.ddb.repair,.opt.repair{background:var(--erbg);color:var(--er)}.tag.tires,.tag.fuel,.ddb.tires,.ddb.fuel,.opt.tires,.opt.fuel{background:var(--blbg);color:var(--bl)}.tag.task,.ddb.task,.opt.task{background:var(--wrbg);color:var(--wr)}
+.opt:hover{background:var(--bd)}.tb{width:100%;border-collapse:collapse;margin-top:8px}.tb th,.tb td{text-align:left;padding:6px 8px;border-top:1px solid var(--bd)}.tb th{color:var(--mu);font-weight:500;font-size:13px}.dd{position:relative}.ddb{font-weight:600}.ddm{position:absolute;z-index:5;top:100%;left:0;margin-top:4px;min-width:150px;background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:4px}.ddm[hidden]{display:none}.opt{padding:7px 10px;border-radius:6px;cursor:pointer;margin:2px 0;font-weight:600}
+.add{background:var(--card);border:1px dashed var(--bd);border-radius:12px;padding:12px;margin:14px 0}
+#note{background:var(--wrbg);color:var(--wr);padding:8px 12px;border-radius:8px;margin-bottom:10px;display:none}
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.grow{flex:1;min-width:120px}
+#lock{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:50}#lock[hidden]{display:none}.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
+
+.lg{margin-top:8px;font-size:13px;border-top:1px solid var(--bd);padding-top:6px}.lg div{padding:2px 0}small{font-size:12px}
+.tasks select{max-width:150px}.hi{background:var(--wrbg)}
+</style></head><body><main>
+<div id="note"></div>
+<div id="lock"><div class="box"><h1>Парк авто</h1><div id="wait" class="mu" style="margin:8px 0 12px"></div><button id="gl" class="pr">Войти через Google</button><button id="lo">Выйти</button></div></div>
+<div id="app" hidden>
+<div class="head"><div><h1>Парк авто · школа дрифта</h1><div class="mu" id="who"></div></div>
+<div class="row"><button id="oilBtn">🛢 Замена масла</button><button id="cabBtn" hidden>Кабинет</button><button id="siteBtn" hidden>+ Площадка</button><button id="addBtn" class="pr" hidden>+ Машина</button><button id="out">Выйти</button></div></div>
+<div class="grid" id="sites"></div>
+<div class="add" id="trBox" hidden></div>
+<div class="add" id="cab" hidden style="border-style:solid"></div>
+<div class="add" id="oilBox" hidden style="border-style:solid"></div>
+<div class="add" id="form" hidden>
+ <div class="row"><div class="grow" style="position:relative"><input id="fName" autocomplete="off" style="width:100%" placeholder="Название (напр. BMW E36 №3)"><div id="sg" class="ddm" hidden style="width:100%"></div></div><input id="fPlate" placeholder="Номер / ID" style="width:130px"></div>
+ <div class="row" style="margin-top:8px"><span class="mu">Последняя замена масла:</span><input id="fOil" type="date"></div>
+ <div class="row" style="margin-top:8px"><select id="fCity" class="grow"></select><button id="save" class="pr">Сохранить</button><button id="cancel">Отмена</button></div>
+</div>
+<div class="add" id="siteForm" hidden><div class="row"><input id="sName" class="grow" placeholder="Название площадки (город)"><button id="sSave" class="pr">Создать</button><button id="sCancel">Отмена</button></div></div>
+<div class="row" style="margin-bottom:10px"><input id="q" class="grow" placeholder="Поиск: название или номер/ID"><select id="flt"><option value="all">Все</option><option value="todo">Требуют работ</option><option value="ready">Готовы</option></select><span class="mu" id="cnt"></span></div>
+<div id="list"></div>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+const SB_URL="https://iymxeqfltaktixditaph.supabase.co/rest/v1/",SB_KEY="sb_publishable_oeJHCI-EDlGFdO4_dyJA7g_qxcR55R7";
+const sb=supabase.createClient(SB_URL,SB_KEY);
+let me=null,sites=[],cars=[],tasks=[],people=[],tr=[],city=null,timer=null;const logs={},openLog={},sel={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const TYPES={repair:"Ремонт",task:"Задача"},ROLE={boss:"Босс",senior:"Ст. механик",mechanic:"Механик"},STAT={pending:"Ожидает",active:"Активен",blocked:"Заблокирован"};
+const isB=()=>me.role==="boss",isS=()=>me.role!=="mechanic";
+const nm=id=>{const p=people.find(x=>x.id===id);return p?(p.name||p.email):"—"};
+const sn=id=>(sites.find(s=>s.id===id)||{}).name||"—";
+const open=c=>tasks.filter(t=>t.car_id===c.id&&!t.done);
+const fdt=d=>new Date(d).toLocaleString("ru-RU",{dateStyle:"short",timeStyle:"short"});
+const fd=d=>d?d.split("-").reverse().join("."):"—";
+const opts=(a,v,f)=>a.map(x=>`<option value="${x.id}" ${x.id===v?"selected":""}>${esc(f(x))}</option>`).join("");
+const dd=id=>{const t=sel[id]||"repair";return `<div class="dd"><button class="ddb ${t}" data-ddb>${TYPES[t]} ▾</button><div class="ddm" hidden>${Object.keys(TYPES).map(k=>`<div class="opt ${k}" data-opt="${k}">${TYPES[k]}</div>`).join("")}</div></div>`};
+function note(t){const n=$("note");n.textContent=t||"";n.style.display=t?"block":"none"}
+function lockMsg(t,signed){$("wait").textContent=t;$("gl").hidden=signed;$("lo").hidden=!signed;$("lock").hidden=false;$("app").hidden=true}
+
+sb.auth.onAuthStateChange((_e,s)=>{setTimeout(()=>boot(s),0)});
+async function boot(s){
+ if(!s){me=null;clearInterval(timer);timer=null;lockMsg("Вход только для сотрудников школы",false);return}
+ const{data}=await sb.from("profiles").select("*").eq("id",s.user.id).single();
+ me=data;
+ if(!me||me.status!=="active"){lockMsg(!me?"Профиль не найден":me.status==="blocked"?"Доступ закрыт боссом":"Вход ожидает подтверждения босса. Зайдите позже.",true);return}
+ $("lock").hidden=true;$("app").hidden=false;
+ $("who").textContent=(me.name||me.email)+" · "+ROLE[me.role];
+ $("cabBtn").hidden=$("siteBtn").hidden=!isB();$("addBtn").hidden=!isS();
+ await load();if(!timer)timer=setInterval(()=>load(true),20000);
+}
+$("gl").onclick=()=>sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.origin+location.pathname}});
+$("lo").onclick=$("out").onclick=()=>sb.auth.signOut();
+
+async function load(auto){
+ if(!me)return;
+ const ae=document.activeElement;if(auto&&ae&&/INPUT|SELECT/.test(ae.tagName)&&ae.type!=="checkbox")return;
+ const q=t=>sb.from(t).select("*");
+ const[a,b,c,d,e]=await Promise.all([q("sites").order("name"),q("cars").order("name"),q("tasks").order("created_at"),q("profiles"),q("transfers").eq("status","pending")]);
+ if(a.error||b.error||c.error){note(a.error?.message||b.error?.message||c.error?.message);return}
+ sites=a.data;cars=b.data;tasks=c.data;people=d.data||[];tr=e.data||[];note("");
+ for(const id in openLog)if(openLog[id])logs[id]=(await sb.from("log").select("*").eq("car_id",id).order("at",{ascending:false})).data||[];
+ render();
+}
+async function rpc(fn,args){const{error}=await sb.rpc(fn,args);if(error){alert(error.message);await load();return false}await load();return true}
+
+const st=a=>({n:a.length,rep:a.filter(c=>open(c).some(t=>t.kind==="repair")).length,att:a.filter(c=>open(c).length&&!open(c).some(t=>t.kind==="repair")).length,rd:a.filter(c=>!open(c).length).length});
+function carHtml(c){
+ const o=open(c),ts=tasks.filter(t=>t.car_id===c.id),ppl=people.filter(p=>p.status==="active"&&(p.site_id===c.site_id||p.role==="boss")),pn=p=>p.name||p.email;
+ const pend=tr.find(t=>t.car_id===c.id);
+ return `<div class="car" data-id="${c.id}"><div class="head"><div><h3>${esc(c.name)} <span class="mu">${esc(c.plate)}</span></h3><div class="mu">📍 ${esc(sn(c.site_id))}${pend?" · ⏳ перемещение → "+esc(sn(pend.to_site))+" ждёт подтверждения":""}</div></div>
+ <div class="row"><span class="pill ${o.length?"wr":"ok"}">${o.length?o.length+" задач":"Готова"}</span>
+ <select data-mv><option value="">${isS()?"Переместить…":"Запросить перемещение…"}</option>${opts(sites.filter(s=>s.id!==c.site_id),"",s=>s.name)}</select>${isB()?'<button class="x" data-del>Удалить</button>':""}</div></div>
+ <div class="row" style="margin-top:8px"><span class="mu">Замена масла:</span><input type="date" data-oil value="${esc(c.oil_date||"")}"></div>
+ <ul class="tasks">${ts.map(t=>`<li class="${t.done?"d":""}"><input type="checkbox" data-t="${t.id}" ${t.done?"checked disabled":""}><span class="tag ${t.kind}">${TYPES[t.kind]}</span><span class="grow">${esc(t.text)}<br><small class="mu">${t.done?"✔ "+esc(nm(t.done_by))+" · "+fdt(t.done_at):"поставил: "+esc(nm(t.created_by))}</small></span>${t.done?"":(isS()?`<select data-as="${t.id}"><option value="">Не назначена</option>${opts(ppl,t.assignee,pn)}</select>`:(t.assignee?`<span class="pill">${esc(nm(t.assignee))}</span>`:""))}${!t.done&&!t.assignee?`<button class="x" data-take="${t.id}">Взять</button>`:""}${isS()?`<button class="x" data-dt="${t.id}">×</button>`:""}</li>`).join("")}</ul>
+ <div class="row" style="margin-top:8px">${dd(c.id)}<input class="grow" data-tx placeholder="Что сделать"><select data-na><option value="">Не назначена</option>${isS()?opts(ppl,"",pn):`<option value="${me.id}">Мне</option>`}</select><button data-add>Добавить</button></div>
+ <div class="row" style="margin-top:6px"><button class="x" data-lg>${openLog[c.id]?"Скрыть историю":"История"}</button></div>
+ ${openLog[c.id]?`<div class="lg">${(logs[c.id]||[]).map(l=>`<div><span class="mu">${fdt(l.at)} · ${esc(l.actor_name||"—")}</span> — ${esc(l.details)}</div>`).join("")||'<span class="mu">Пусто</span>'}</div>`:""}</div>`}
+function oilHtml(){const a=cars.filter(c=>!city||c.site_id===city).sort((x,y)=>(x.oil_date?0:1)-(y.oil_date?0:1)||(x.oil_date||"").localeCompare(y.oil_date||""));
+ return `<div class="head"><b>Замена масла${city?" · "+esc(sn(city)):""}</b><button class="x" id="oilClose">Закрыть</button></div><div style="overflow-x:auto"><table class="tb"><tr><th>Машина</th><th>Код</th><th>Последняя замена</th></tr>${a.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.plate)||"—"}</td><td>${fd(c.oil_date)}</td></tr>`).join("")||'<tr><td colspan="3" class="mu">Нет машин</td></tr>'}</table></div>`}
+function cabHtml(){return `<div class="head"><b>Кабинет: сотрудники</b><button class="x" id="cabClose">Закрыть</button></div><div style="overflow-x:auto"><table class="tb"><tr><th>Сотрудник</th><th>Роль</th><th>Площадка</th><th>Статус</th><th></th></tr>${people.map(p=>`<tr data-p="${p.id}" class="${p.status==="pending"?"hi":""}"><td>${esc(p.name||"")}<br><small class="mu">${esc(p.email)}</small></td><td><select class="r">${Object.keys(ROLE).map(k=>`<option value="${k}" ${k===p.role?"selected":""}>${ROLE[k]}</option>`).join("")}</select></td><td><select class="s"><option value="">—</option>${opts(sites,p.site_id,s=>s.name)}</select></td><td><select class="u">${Object.keys(STAT).map(k=>`<option value="${k}" ${k===p.status?"selected":""}>${STAT[k]}</option>`).join("")}</select></td><td><button data-sp>Сохранить</button></td></tr>`).join("")}</table></div>`}
+function render(){
+ const vs=isB()?sites:sites.filter(s=>s.id===me.site_id);
+ if(city&&!vs.some(s=>s.id===city))city=null;
+ const card=(k,name,a)=>{const x=st(a);return `<div class="site ${city===k?"on":""}" data-c="${k||""}"><b>${esc(name)}</b><div class="nums"><span class="pill">${x.n} машин</span><span class="pill er">${x.rep} в ремонте</span><span class="pill wr">${x.att} внимание</span><span class="pill ok">${x.rd} готово</span></div><div class="bar"><i style="width:${x.n?x.rd/x.n*100:0}%"></i></div></div>`};
+ $("sites").innerHTML=vs.length?(vs.length>1?card(null,"Все площадки",cars):"")+vs.map(s=>card(s.id,s.name,cars.filter(c=>c.site_id===s.id))).join(""):`<div class="mu">Нет площадок${isB()?". Нажмите «+ Площадка»":" (босс ещё не назначил вам площадку)"}.</div>`;
+ const fc=$("fCity"),cv=fc.value,fs=isB()?sites:sites.filter(s=>s.id===me.site_id);fc.innerHTML=fs.length?opts(fs,cv,s=>s.name):'<option value="">— нет площадки —</option>';
+ const trs=tr.filter(t=>isB()||t.from_site===me.site_id);
+ $("trBox").hidden=!(isS()&&trs.length);
+ $("trBox").innerHTML=`<b>Запросы на перемещение</b>`+trs.map(t=>{const c=cars.find(x=>x.id===t.car_id);return `<div class="row" style="margin-top:6px" data-tr="${t.id}"><span class="grow">${esc(c?c.name:"—")}: «${esc(sn(t.from_site))}» → «${esc(sn(t.to_site))}» · запросил ${esc(nm(t.requested_by))}</span><button class="pr" data-ok>Подтвердить</button><button data-no>Отклонить</button></div>`}).join("");
+ const pc=people.filter(p=>p.status==="pending").length;$("cabBtn").textContent="Кабинет"+(pc?" ("+pc+")":"");
+ if(!$("cab").hidden)$("cab").innerHTML=cabHtml();if(!$("oilBox").hidden)$("oilBox").innerHTML=oilHtml();
+ const q=$("q").value.trim().toLowerCase();
+ let v=q?cars.filter(c=>(c.name+" "+c.plate).toLowerCase().includes(q)):cars.filter(c=>!city||c.site_id===city);
+ const f=$("flt").value;if(f==="todo")v=v.filter(c=>open(c).length);if(f==="ready")v=v.filter(c=>!open(c).length);
+ $("cnt").innerHTML=v.length+" шт."+(isB()&&!q&&city&&!cars.some(c=>c.site_id===city)?' <button class="x" id="delSite">Удалить пустую площадку</button>':"");
+ $("list").innerHTML=v.sort((a,b)=>open(b).length-open(a).length).map(carHtml).join("");
+}
+$("sites").onclick=e=>{const s=e.target.closest(".site");if(!s)return;city=s.dataset.c||null;render()};
+$("flt").onchange=$("q").oninput=render;
+$("cnt").onclick=e=>{if(e.target.id==="delSite"&&confirm("Удалить площадку «"+sn(city)+"»?")){const i=city;city=null;rpc("delete_site",{p_id:i})}};
+$("addBtn").onclick=()=>{$("form").hidden=false;if(city)$("fCity").value=city;$("fName").focus()};
+$("cancel").onclick=()=>$("form").hidden=true;
+$("save").onclick=async()=>{const name=$("fName").value.trim(),site=$("fCity").value;if(!name||!site){alert("Укажите название и площадку");return}
+ if(await rpc("add_car",{p_name:name,p_plate:$("fPlate").value.trim(),p_site:site,p_oil:$("fOil").value||null})){$("fName").value=$("fPlate").value=$("fOil").value="";$("sg").hidden=true;$("form").hidden=true}};
+$("siteBtn").onclick=()=>{$("siteForm").hidden=false;$("sName").focus()};
+$("sCancel").onclick=()=>$("siteForm").hidden=true;
+$("sSave").onclick=async()=>{const n=$("sName").value.trim();if(n&&await rpc("add_site",{p_name:n})){$("sName").value="";$("siteForm").hidden=true}};
+$("oilBtn").onclick=()=>{const b=$("oilBox");b.hidden=!b.hidden;if(!b.hidden)b.innerHTML=oilHtml()};
+$("oilBox").onclick=e=>{if(e.target.id==="oilClose")$("oilBox").hidden=true};
+$("cabBtn").onclick=()=>{const b=$("cab");b.hidden=!b.hidden;if(!b.hidden)b.innerHTML=cabHtml()};
+$("cab").onclick=e=>{if(e.target.id==="cabClose")$("cab").hidden=true;
+ if(e.target.dataset.sp!==undefined){const r=e.target.closest("tr");rpc("set_profile",{p_id:r.dataset.p,p_role:r.querySelector(".r").value,p_status:r.querySelector(".u").value,p_site:r.querySelector(".s").value||null})}};
+$("trBox").onclick=e=>{const r=e.target.closest("[data-tr]");if(!r)return;
+ if(e.target.dataset.ok!==undefined)rpc("decide_transfer",{p_id:r.dataset.tr,p_ok:true});
+ if(e.target.dataset.no!==undefined)rpc("decide_transfer",{p_id:r.dataset.tr,p_ok:false})};
+document.addEventListener("click",e=>{if(!e.target.closest(".dd"))document.querySelectorAll(".ddm").forEach(m=>m.hidden=true)});
+$("list").onclick=async e=>{
+ const el=e.target.closest(".car");if(!el)return;const id=el.dataset.id,c=cars.find(x=>x.id===id),d=e.target.dataset;
+ const b=e.target.closest("[data-ddb]"),o=e.target.closest("[data-opt]");
+ if(b){const m=el.querySelector(".ddm");m.hidden=!m.hidden;return}
+ if(o){sel[id]=o.dataset.opt;const bt=el.querySelector("[data-ddb]");bt.className="ddb "+o.dataset.opt;bt.textContent=TYPES[o.dataset.opt]+" ▾";el.querySelector(".ddm").hidden=true;return}
+ if(d.del!==undefined){if(confirm("Удалить машину «"+c.name+"»?"))rpc("delete_car",{p_id:id});return}
+ if(d.take)return void rpc("take_task",{p_task:d.take});
+ if(d.dt){if(confirm("Удалить задачу?"))rpc("delete_task",{p_task:d.dt});return}
+ if(d.add!==undefined){const tx=el.querySelector("[data-tx]").value.trim();if(!tx)return;
+  rpc("add_task",{p_car:id,p_kind:sel[id]||"repair",p_text:tx,p_assignee:el.querySelector("[data-na]").value||null});return}
+ if(d.lg!==undefined){openLog[id]=!openLog[id];await load();return}
+};
+$("list").onchange=e=>{
+ const el=e.target.closest(".car");if(!el)return;const id=el.dataset.id,c=cars.find(x=>x.id===id),d=e.target.dataset,v=e.target.value;
+ if(d.t)return void rpc("complete_task",{p_task:d.t});
+ if(d.oil!==undefined)return void rpc("set_oil",{p_car:id,p_date:v||null});
+ if(d.as!==undefined)return void rpc("assign_task",{p_task:d.as,p_assignee:v||null});
+ if(d.mv!==undefined){if(!v)return;
+  const msg=isS()?"Переместить «"+c.name+"» из «"+sn(c.site_id)+"» в «"+sn(v)+"»?\nВы уверены?":"Отправить ст. механику запрос на перемещение «"+c.name+"» в «"+sn(v)+"»?\nВы уверены?";
+  if(confirm(msg))rpc(isS()?"move_car":"request_transfer",isS()?{p_car:id,p_to:v}:{p_car:id,p_to:v});else render()}
+};
+const MAP={а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"e",ж:"zh",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"h",ц:"c",ч:"ch",ш:"sh",щ:"sh",ы:"y",э:"e",ю:"yu",я:"ya"};
+const nz=s=>s.toLowerCase().replace(/[а-яё]/g,c=>MAP[c]).replace(/w/g,"v").replace(/x/g,"ks").replace(/[\s\-\/]/g,"");
+const BR=[
+["BMW","бмв бумер бэха",["E30","E34","E36","E39","E46","E60","E90","E92","F30","G20"]],
+["Nissan","ниссан",["Silvia S13","Silvia S14","Silvia S15","180SX","200SX","Skyline R32","Skyline R33","Skyline R34","350Z","370Z","Laurel C33"]],
+["Toyota","тойота",["AE86","Chaser JZX100","Mark II JZX90","Mark II JZX100","Cresta JZX90","Soarer JZZ30","Supra A80","GT86"]],
+["Mazda","мазда",["RX-7 FC","RX-7 FD","RX-8","MX-5"]],
+["Lexus","лексус",["IS200","IS300","SC300","GS300"]],
+["Honda","хонда",["S2000","Civic EG","Civic EK","Integra DC2"]],
+["Subaru","субару",["BRZ","Impreza","Legacy"]],
+["Mitsubishi","митсубиси",["Lancer Evolution","Eclipse","GTO"]],
+["Infiniti","инфинити",["G35","G37","Q50"]],
+["Mercedes","мерседес мерс",["W124","W201","W202","W210"]],
+["Audi","ауди",["80 B4","100 C4","A4 B5","A4 B6"]],
+["Ford","форд",["Mustang","Focus","Mondeo"]],
+["Chevrolet","шевроле шеви",["Camaro","Corvette","Cobalt"]],
+["ВАЗ","ваз лада жигули vaz lada",["2105","2106","2107","2108","2109","2110","2114"]]];
+function sugg(v){const t=v.trim().split(/\s+/);if(!t[0])return[];const b=nz(t[0]),r=nz(t.slice(1).join("")),o=[];
+ for(const[br,al,ms]of BR){if(![br,...al.split(" ")].some(a=>nz(a).startsWith(b)))continue;for(const m of ms)if(!r||nz(m).includes(r))o.push(br+" "+m)}
+ return o.slice(0,8)}
+$("fName").oninput=()=>{const v=$("fName").value.trim().toLowerCase(),a=sugg(v).filter(x=>x.toLowerCase()!==v),g=$("sg");g.innerHTML=a.map(x=>`<div class="opt" data-sg="${esc(x)}">${esc(x)}</div>`).join("");g.hidden=!a.length};
+$("sg").onclick=e=>{const o=e.target.closest("[data-sg]");if(o){$("fName").value=o.dataset.sg+" ";$("sg").hidden=true;$("fName").focus()}};
+</script></body></html>
