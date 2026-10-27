@@ -27,6 +27,12 @@ button{cursor:pointer}button.pr{background:var(--ac);color:#fff;border-color:var
 .car[open] .car-summary:after{transform:rotate(180deg)}
 .car-summary h3{margin:0;font-size:16px;min-width:0}.car-summary .pill{white-space:nowrap}
 .car-details{padding-top:10px}
+.ready-control{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.ready-control button{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.ready-control button:disabled{opacity:.6;cursor:not-allowed}
+.ready-note{color:var(--er);font-size:13px}
+.car-actions{display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid var(--bd)}
+button.danger{background:var(--erbg);color:var(--er);border-color:var(--er)}
 @media(max-width:620px){.car-summary{grid-template-columns:minmax(0,1fr) auto 18px;gap:4px 8px}.car-summary h3{grid-column:1;grid-row:1}.car-summary .pill{grid-column:2;grid-row:1}.car-summary .car-place{grid-column:1;grid-row:2}.car-summary .car-oil{grid-column:1;grid-row:3}.car-summary:after{grid-column:3;grid-row:1 / span 3;align-self:center}}
 .car h3{margin:0;font-size:16px}.tasks{margin:8px 0 0;padding:0;list-style:none}
 .tasks li{display:flex;gap:8px;align-items:center;padding:5px 0;border-top:1px solid var(--bd)}
@@ -107,18 +113,23 @@ async function load(auto){
 }
 async function rpc(fn,args){const{error}=await sb.rpc(fn,args);if(error){alert(error.message);await load();return false}await load();return true}
 
-const st=a=>({n:a.length,rep:a.filter(c=>open(c).some(t=>t.kind==="repair")).length,att:a.filter(c=>open(c).length&&!open(c).some(t=>t.kind==="repair")).length,rd:a.filter(c=>!open(c).length).length});
+const carStatus=c=>{const o=open(c);if(o.some(t=>t.kind==="repair"))return"repair";if(c.manual_ready)return"ready";return o.length?"attention":"ready"};
+const carStatusLabel=c=>{const s=carStatus(c),o=open(c);return s==="repair"?"В ремонте"+(o.length>1?" · "+o.length+" задач":""):s==="attention"?o.length+" задач":c.manual_ready&&o.length?"Готова вручную":"Готова"};
+const carStatusPill=c=>`<span class="pill ${carStatus(c)==="ready"?"ok":carStatus(c)==="repair"?"er":"wr"}">${carStatusLabel(c)}</span>`;
+const st=a=>({n:a.length,rep:a.filter(c=>carStatus(c)==="repair").length,att:a.filter(c=>carStatus(c)==="attention").length,rd:a.filter(c=>carStatus(c)==="ready").length});
 function carHtml(c){
- const o=open(c),ts=tasks.filter(t=>t.car_id===c.id),ppl=people.filter(p=>p.status==="active"&&(p.site_id===c.site_id||p.role==="boss"||p.all_sites)),pn=p=>p.name||p.email;
+ const o=open(c),repairOpen=o.some(t=>t.kind==="repair"),ts=tasks.filter(t=>t.car_id===c.id),ppl=people.filter(p=>p.status==="active"&&(p.site_id===c.site_id||p.role==="boss"||p.all_sites)),pn=p=>p.name||p.email;
  const pend=tr.find(t=>t.car_id===c.id);
- return `<details class="car" data-id="${c.id}" ${expanded[c.id]?"open":""}><summary class="car-summary"><h3>${esc(c.name)}</h3><span class="mu car-place">📍 ${esc(sn(c.site_id))}</span><span class="mu car-oil">🛢 Замена масла: ${fd(c.oil_date)}</span><span class="pill ${o.length?"wr":"ok"}">${o.length?o.length+" задач":"Готова"}</span></summary><div class="car-details"><div class="head"><div><div class="mu">${esc(c.plate)||"—"}${pend?" · ⏳ перемещение → "+esc(sn(pend.to_site))+" ждёт подтверждения":""}</div></div>
- <div class="row"><span class="pill ${o.length?"wr":"ok"}">${o.length?o.length+" задач":"Готова"}</span>
- <select data-mv><option value="">${isS()?"Переместить…":"Запросить перемещение…"}</option>${opts(sites.filter(s=>s.id!==c.site_id),"",s=>s.name)}</select>${isB()?'<button class="x" data-del>Удалить</button>':""}</div></div>
+ return `<details class="car" data-id="${c.id}" ${expanded[c.id]?"open":""}><summary class="car-summary"><h3>${esc(c.name)}</h3><span class="mu car-place">📍 ${esc(sn(c.site_id))}</span><span class="mu car-oil">🛢 Замена масла: ${fd(c.oil_date)}</span>${carStatusPill(c)}</summary><div class="car-details"><div class="head"><div><div class="mu">${esc(c.plate)||"—"}${pend?" · ⏳ перемещение → "+esc(sn(pend.to_site))+" ждёт подтверждения":""}</div></div>
+ <div class="row">${carStatusPill(c)}
+ <select data-mv><option value="">${isS()?"Переместить…":"Запросить перемещение…"}</option>${opts(sites.filter(s=>s.id!==c.site_id),"",s=>s.name)}</select></div></div>
+ ${isS()&&o.length?`<div class="ready-control"><button data-ready ${repairOpen&&!c.manual_ready?"disabled":""}>${c.manual_ready?"Снять ручную готовность":"Отметить готовой вручную"}</button>${repairOpen?'<span class="ready-note">Незавершённый ремонт не позволяет отметить машину готовой.</span>':""}</div>`:""}
  <div class="row" style="margin-top:8px"><span class="mu">Замена масла:</span><input type="date" data-oil value="${esc(c.oil_date||"")}"></div>
  <ul class="tasks">${ts.map(t=>`<li class="${t.done?"d":""}"><input type="checkbox" data-t="${t.id}" ${t.done?"checked disabled":""}><span class="tag ${t.kind}">${TYPES[t.kind]}</span><span class="grow">${esc(t.text)}<br><small class="mu">${t.done?"✔ "+esc(nm(t.done_by))+" · "+fdt(t.done_at):"поставил: "+esc(nm(t.created_by))}</small></span>${t.done?"":(isS()?`<select data-as="${t.id}"><option value="">Не назначена</option>${opts(ppl,t.assignee,pn)}</select>`:(t.assignee?`<span class="pill">${esc(nm(t.assignee))}</span>`:""))}${!t.done&&!t.assignee?`<button class="x" data-take="${t.id}">Взять</button>`:""}${isS()?`<button class="x" data-dt="${t.id}">×</button>`:""}</li>`).join("")}</ul>
  <div class="row" style="margin-top:8px">${dd(c.id)}<input class="grow" data-tx placeholder="Что сделать"><select data-na><option value="">Не назначена</option>${isS()?opts(ppl,"",pn):`<option value="${me.id}">Мне</option>`}</select><button data-add>Добавить</button></div>
  <div class="row" style="margin-top:6px"><button class="x" data-lg>${openLog[c.id]?"Скрыть историю":"История"}</button></div>
- ${openLog[c.id]?`<div class="lg">${(logs[c.id]||[]).map(l=>`<div><span class="mu">${fdt(l.at)} · ${esc(l.actor_name||"—")}</span> — ${esc(l.details)}</div>`).join("")||'<span class="mu">Пусто</span>'}</div>`:""}</div></details>`}
+ ${openLog[c.id]?`<div class="lg">${(logs[c.id]||[]).map(l=>`<div><span class="mu">${fdt(l.at)} · ${esc(l.actor_name||"—")}</span> — ${esc(l.details)}</div>`).join("")||'<span class="mu">Пусто</span>'}</div>`:""}
+ ${isB()?'<div class="car-actions"><button class="danger" data-del>Удалить машину</button></div>':""}</div></details>`}
 function oilHtml(){const a=cars.filter(c=>!city||c.site_id===city).sort((x,y)=>(x.oil_date?0:1)-(y.oil_date?0:1)||(x.oil_date||"").localeCompare(y.oil_date||""));
  return `<div class="head"><b>Замена масла${city?" · "+esc(sn(city)):""}</b><button class="x" id="oilClose">Закрыть</button></div><div style="overflow-x:auto"><table class="tb"><tr><th>Машина</th><th>Код</th><th>Последняя замена</th></tr>${a.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.plate)||"—"}</td><td>${fd(c.oil_date)}</td></tr>`).join("")||'<tr><td colspan="3" class="mu">Нет машин</td></tr>'}</table></div>`}
 function cabHtml(){return `<div class="head"><b>Кабинет: сотрудники</b><button class="x" id="cabClose">Закрыть</button></div><div style="overflow-x:auto"><table class="tb"><tr><th>Сотрудник</th><th>Роль</th><th>Площадка</th><th>Статус</th><th></th></tr>${people.map(p=>`<tr data-p="${p.id}" class="${p.status==="pending"?"hi":""}"><td>${esc(p.name||"")}<br><small class="mu">${esc(p.email)}</small></td><td><select class="r">${Object.keys(ROLE).map(k=>`<option value="${k}" ${k===p.role?"selected":""}>${ROLE[k]}</option>`).join("")}</select></td><td><select class="s"><option value="" ${!p.all_sites&&!p.site_id?"selected":""}>—</option><option value="all" ${p.all_sites?"selected":""}>ВСЕ площадки</option>${opts(sites,p.all_sites?"":p.site_id,s=>s.name)}</select></td><td><select class="u">${Object.keys(STAT).map(k=>`<option value="${k}" ${k===p.status?"selected":""}>${STAT[k]}</option>`).join("")}</select></td><td><button data-sp>Сохранить</button>${p.id===me.id?"":` <button class="x" data-profile-del>Удалить профиль</button>`}</td></tr>`).join("")}</table></div>`}
@@ -136,7 +147,7 @@ function render(){
  if(!$("cab").hidden)$("cab").innerHTML=cabHtml();if(!$("oilBox").hidden)$("oilBox").innerHTML=oilHtml();
  const q=$("q").value.trim().toLowerCase();
  let v=q?cars.filter(c=>(c.name+" "+c.plate).toLowerCase().includes(q)):cars.filter(c=>!city||c.site_id===city);
- const f=$("flt").value;if(f==="todo")v=v.filter(c=>open(c).length);if(f==="ready")v=v.filter(c=>!open(c).length);
+ const f=$("flt").value;if(f==="todo")v=v.filter(c=>carStatus(c)!=="ready");if(f==="ready")v=v.filter(c=>carStatus(c)==="ready");
  $("cnt").innerHTML=v.length+" шт."+(isB()&&!q&&city&&!cars.some(c=>c.site_id===city)?' <button class="x" id="delSite">Удалить пустую площадку</button>':"");
  $("list").innerHTML=v.sort((a,b)=>open(b).length-open(a).length).map(carHtml).join("");
 }
@@ -165,6 +176,7 @@ $("list").onclick=async e=>{
  const b=e.target.closest("[data-ddb]"),o=e.target.closest("[data-opt]");
  if(b){const m=el.querySelector(".ddm");m.hidden=!m.hidden;return}
  if(o){sel[id]=o.dataset.opt;const bt=el.querySelector("[data-ddb]");bt.className="ddb "+o.dataset.opt;bt.textContent=TYPES[o.dataset.opt]+" ▾";el.querySelector(".ddm").hidden=true;return}
+ if(d.ready!==undefined){rpc("set_car_ready",{p_car:id,p_ready:!c.manual_ready});return}
  if(d.del!==undefined){if(confirm("Удалить машину «"+c.name+"»?"))rpc("delete_car",{p_id:id});return}
  if(d.take)return void rpc("take_task",{p_task:d.take});
  if(d.dt){if(confirm("Удалить задачу?"))rpc("delete_task",{p_task:d.dt});return}
