@@ -128,7 +128,7 @@ async function boot(s){
  $("cabBtn").hidden=$("siteBtn").hidden=!isB();$("addBtn").hidden=!isS();
  await load();if(!timer)timer=setInterval(()=>load(true),20000);
 }
-$("gl").onclick=async()=>{try{const{error}=await sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:AUTH_REDIRECT_URL}});if(error)showAuthMessage(error.message)}catch(error){showAuthMessage(error.message||"Не удалось войти через Google")}};
+$("gl").onclick=async()=>{try{if(window.Capacitor?.isNativePlatform?.()){if(!window.__nativeGoogleSignIn)throw new Error("Мобильная авторизация ещё загружается");await window.__nativeGoogleSignIn();return}const{error}=await sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:AUTH_REDIRECT_URL}});if(error)showAuthMessage(error.message)}catch(error){showAuthMessage(error.message||"Не удалось войти через Google")}};
 $("lo").onclick=$("out").onclick=()=>sb.auth.signOut();
 $("modeSwitch").onclick=()=>setAuthMode(authMode==="login"?"register":"login");
 $("authForm").onsubmit=async e=>{

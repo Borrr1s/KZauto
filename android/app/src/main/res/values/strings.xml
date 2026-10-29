@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">KZauto</string>
+    <string name="title_activity_main">KZauto</string>
+    <string name="package_name">ru.kzauto.app</string>
+    <string name="custom_url_scheme">ru.kzauto.app</string>
+</resources>

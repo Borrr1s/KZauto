@@ -1,0 +1,57 @@
+name: Build mobile apps
+
+on:
+  push:
+    branches:
+      - apk
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run cap:sync -- android
+      - run: bash android/gradlew --no-daemon -p android assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kzauto-android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run cap:sync -- ios
+      - run: >-
+          xcodebuild
+          -project ios/App/App.xcodeproj
+          -scheme App
+          -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath build/ios
+          CODE_SIGNING_ALLOWED=NO
+          build
+      - run: ditto -c -k --sequesterRsrc --keepParent build/ios/Build/Products/Debug-iphonesimulator/App.app build/kzauto-ios-simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kzauto-ios-simulator
+          path: build/kzauto-ios-simulator.zip
+          if-no-files-found: error
