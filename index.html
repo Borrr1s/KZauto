@@ -26,6 +26,9 @@ button{cursor:pointer}button.pr{background:var(--ac);color:#fff;border-color:var
 .car[open] .car-summary{padding-bottom:10px;border-bottom:1px solid var(--bd)}
 .car[open] .car-summary:after{transform:rotate(180deg)}
 .car-summary h3{margin:0;font-size:16px}
+.car-summary .car-title{min-width:0;overflow:visible;text-overflow:clip;white-space:normal}
+.car-summary .car-name{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.car-summary .car-id{display:block;min-width:0;color:var(--mu);font-size:11px;line-height:1.25;overflow-wrap:anywhere}
 .car-summary h3,.car-summary .car-place,.car-summary .car-oil{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .car-summary .pill{white-space:nowrap}
 .car-status{display:flex;align-items:center;justify-content:flex-end;gap:4px;min-width:0;overflow:hidden;white-space:nowrap}
@@ -38,7 +41,7 @@ button{cursor:pointer}button.pr{background:var(--ac);color:#fff;border-color:var
 .ready-note{color:var(--er);font-size:13px}
 .car-actions{display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid var(--bd)}
 button.danger{background:var(--erbg);color:var(--er);border-color:var(--er)}
-@media(max-width:620px){.car-summary{grid-template-columns:minmax(0,1fr) minmax(132px,1.6fr) 18px;gap:4px 8px}.car-summary h3{grid-column:1;grid-row:1}.car-summary .car-status{grid-column:2;grid-row:1}.car-summary .car-place{grid-column:1;grid-row:2}.car-summary .car-oil{grid-column:1;grid-row:3}.car-summary:after{grid-column:3;grid-row:1 / span 3;align-self:center}}
+@media(max-width:620px){.car-summary{grid-template-columns:minmax(0,1fr) minmax(132px,1.6fr) 18px;gap:4px 8px}.car-summary .car-title{grid-column:1 / 3;grid-row:1}.car-summary .car-status{grid-column:2;grid-row:2}.car-summary .car-place{grid-column:1;grid-row:2}.car-summary .car-oil{grid-column:1 / 3;grid-row:3;overflow:visible;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}.car-summary:after{grid-column:3;grid-row:1 / span 3;align-self:center}}
 .car h3{margin:0;font-size:16px}.tasks{margin:8px 0 0;padding:0;list-style:none}
 .tasks li{display:flex;gap:8px;align-items:center;padding:5px 0;border-top:1px solid var(--bd)}
 .tasks li.d span{text-decoration:line-through;color:var(--mu)}
@@ -193,8 +196,8 @@ const carStatusPill=c=>{const s=carStatus(c),o=open(c),manualReady=s==="ready"&&
 const st=a=>({n:a.length,rep:a.filter(c=>carStatus(c)==="repair").length,att:a.filter(c=>carStatus(c)==="attention").length,rd:a.filter(c=>carStatus(c)==="ready").length});
 function carHtml(c){
  const o=open(c),repairOpen=o.some(t=>t.kind==="repair"),ts=tasks.filter(t=>t.car_id===c.id),ppl=people.filter(p=>p.status==="active"&&(p.site_id===c.site_id||p.role==="boss"||p.all_sites)),pn=p=>p.name||p.email;
- const pend=tr.find(t=>t.car_id===c.id);
- return `<details class="car" data-id="${c.id}" ${expanded[c.id]?"open":""}><summary class="car-summary"><h3>${esc(c.name)}</h3><span class="mu car-place">📍 ${esc(sn(c.site_id))}</span><span class="mu car-oil">🛢 Замена масла: ${fd(c.oil_date)}</span>${carStatusPill(c)}</summary><div class="car-details"><div class="head"><div><div class="mu">${esc(c.plate)||"—"}${pend?" · ⏳ перемещение → "+esc(sn(pend.to_site))+" ждёт подтверждения":""}</div></div>
+ const pend=tr.find(t=>t.car_id===c.id),plate=String(c.plate??"").trim();
+ return `<details class="car" data-id="${c.id}" ${expanded[c.id]?"open":""}><summary class="car-summary"><h3 class="car-title"><span class="car-name">${esc(c.name)}</span>${plate?`<small class="car-id">ID: ${esc(plate)}</small>`:""}</h3><span class="mu car-place">📍 ${esc(sn(c.site_id))}</span><span class="mu car-oil">🛢 Замена масла: ${fd(c.oil_date)}</span>${carStatusPill(c)}</summary><div class="car-details"><div class="head"><div><div class="mu">${esc(c.plate)||"—"}${pend?" · ⏳ перемещение → "+esc(sn(pend.to_site))+" ждёт подтверждения":""}</div></div>
  <div class="row">${carStatusPill(c)}
  <select data-mv><option value="">${isS()?"Переместить…":"Запросить перемещение…"}</option>${opts(sites.filter(s=>s.id!==c.site_id),"",s=>s.name)}</select></div></div>
  ${isS()&&o.length?`<div class="ready-control"><button data-ready ${repairOpen&&!c.manual_ready?"disabled":""}>${c.manual_ready?"Снять ручную готовность":"Отметить готовой вручную"}</button>${repairOpen?'<span class="ready-note">Незавершённый ремонт не позволяет отметить машину готовой.</span>':""}</div>`:""}
