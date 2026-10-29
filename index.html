@@ -50,12 +50,32 @@ button.danger{background:var(--erbg);color:var(--er);border-color:var(--er)}
 .head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .grow{flex:1;min-width:120px}
 #lock{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:50}#lock[hidden]{display:none}.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:20px;text-align:center}
+.auth-box{width:min(100% - 32px,400px)}
+.auth-form{display:grid;gap:8px;margin-top:12px;text-align:left}
+.auth-form[hidden],.auth-form label[hidden]{display:none}
+.auth-form label{display:grid;gap:4px;color:var(--mu);font-size:13px}
+.auth-form input,.auth-form button,#gl{width:100%}
+.auth-links{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:4px}
+.auth-link{border:0;background:transparent;color:var(--ac);padding:4px;font-size:13px}
+.auth-divider{color:var(--mu);font-size:13px;margin:12px 0}
+.auth-message{min-height:1.3em;margin-top:10px;font-size:13px;color:var(--er)}
+.auth-message.ok{color:var(--ok)}
 
 .lg{margin-top:8px;font-size:13px;border-top:1px solid var(--bd);padding-top:6px}.lg div{padding:2px 0}small{font-size:12px}
 .tasks select{max-width:150px}.hi{background:var(--wrbg)}
 </style></head><body><main>
 <div id="note"></div>
-<div id="lock"><div class="box"><h1>Парк авто</h1><div id="wait" class="mu" style="margin:8px 0 12px"></div><button id="gl" class="pr">Войти через Google</button><button id="lo">Выйти</button></div></div>
+<div id="lock"><div class="box auth-box"><h1>Парк авто</h1><div id="wait" class="mu" style="margin:8px 0 12px"></div>
+<div id="authPanel"><form id="authForm" class="auth-form">
+<label id="nameField" hidden>Имя<input id="authName" name="name" autocomplete="name"></label>
+<label>Почта<input id="authEmail" name="email" type="email" autocomplete="email" required></label>
+<label>Пароль<input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="6" required></label>
+<button id="authSubmit" class="pr" type="submit">Войти</button>
+<div class="auth-links"><button id="modeSwitch" class="auth-link" type="button">Нет аккаунта? Регистрация</button><button id="forgotBtn" class="auth-link" type="button">Забыли пароль?</button></div>
+</form><div class="auth-divider">или</div><button id="gl" class="pr" type="button">Войти через Google</button></div>
+<form id="resetPanel" class="auth-form" hidden><label>Почта<input id="resetEmail" type="email" autocomplete="email" required></label><button class="pr" type="submit">Отправить ссылку для сброса</button><button id="resetBack" type="button">Назад ко входу</button><div id="resetMessage" class="auth-message" role="status" aria-live="polite"></div></form>
+<form id="recoveryPanel" class="auth-form" hidden><label>Новый пароль<input id="newPassword" type="password" autocomplete="new-password" minlength="6" required></label><label>Повторите пароль<input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" required></label><button class="pr" type="submit">Сохранить пароль</button></form>
+<div id="authMessage" class="auth-message" role="status" aria-live="polite"></div><button id="lo" hidden type="button">Выйти</button></div></div>
 <div id="app" hidden>
 <div class="head"><div><h1>Парк авто · Культура Заноса</h1><div class="mu" id="who"></div></div>
 <div class="row"><button id="oilBtn">🛢 Замена масла</button><button id="cabBtn" hidden>Кабинет</button><button id="siteBtn" hidden>+ Площадка</button><button id="addBtn" class="pr" hidden>+ Машина</button><button id="out">Выйти</button></div></div>
@@ -77,7 +97,9 @@ button.danger{background:var(--erbg);color:var(--er);border-color:var(--er)}
 <script>
 const SB_URL="https://iymxeqfltaktixditaph.supabase.co",SB_KEY="sb_publishable_oeJHCI-EDlGFdO4_dyJA7g_qxcR55R7";
 const sb=supabase.createClient(SB_URL,SB_KEY);
+const AUTH_REDIRECT_URL="https://borrrr1s.github.io/KZauto/";
 let me=null,sites=[],cars=[],tasks=[],people=[],tr=[],city=null,timer=null;const logs={},openLog={},sel={},expanded={};
+let authMode="login",recoverySession=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
 const TYPES={repair:"Ремонт",task:"Задача"},ROLE={boss:"Босс",senior:"Ст. механик",mechanic:"Механик"},STAT={pending:"Ожидает",active:"Активен",blocked:"Заблокирован"};
@@ -90,9 +112,12 @@ const fd=d=>d?d.split("-").reverse().join("."):"—";
 const opts=(a,v,f)=>a.map(x=>`<option value="${x.id}" ${x.id===v?"selected":""}>${esc(f(x))}</option>`).join("");
 const dd=id=>{const t=sel[id]||"repair";return `<div class="dd"><button class="ddb ${t}" data-ddb>${TYPES[t]} ▾</button><div class="ddm" hidden>${Object.keys(TYPES).map(k=>`<div class="opt ${k}" data-opt="${k}">${TYPES[k]}</div>`).join("")}</div></div>`};
 function note(t){const n=$("note");n.textContent=t||"";n.style.display=t?"block":"none"}
-function lockMsg(t,signed){$("wait").textContent=t;$("gl").hidden=signed;$("lo").hidden=!signed;$("lock").hidden=false;$("app").hidden=true}
+function showAuthMessage(text,success=false){const e=$("authMessage");e.textContent=text;e.className="auth-message"+(success?" ok":"")}
+function setAuthMode(mode){authMode=mode;const registering=mode==="register";$("nameField").hidden=!registering;$("authName").required=registering;$("authPassword").autocomplete=registering?"new-password":"current-password";$("authSubmit").textContent=registering?"Зарегистрироваться":"Войти";$("modeSwitch").textContent=registering?"Уже есть аккаунт? Войти":"Нет аккаунта? Регистрация";$("forgotBtn").hidden=registering;showAuthMessage("")}
+function lockMsg(t,signed){$("wait").textContent=t;$("authPanel").hidden=signed;$("resetPanel").hidden=true;$("recoveryPanel").hidden=true;$("authMessage").textContent="";$("resetMessage").textContent="";$("gl").hidden=signed;$("lo").hidden=!signed;$("lock").hidden=false;$("app").hidden=true}
+function showRecoveryForm(){ $("wait").textContent="Введите новый пароль";$("authPanel").hidden=true;$("resetPanel").hidden=true;$("recoveryPanel").hidden=false;$("authMessage").textContent="";$("lock").hidden=false;$("app").hidden=true}
 
-sb.auth.onAuthStateChange((_e,s)=>{setTimeout(()=>boot(s),0)});
+sb.auth.onAuthStateChange((event,s)=>{if(event==="PASSWORD_RECOVERY"){recoverySession=s;setTimeout(showRecoveryForm,0);return}setTimeout(()=>boot(s),0)});
 async function boot(s){
  if(!s){me=null;clearInterval(timer);timer=null;lockMsg("Вход только для сотрудников школы",false);return}
  const{data}=await sb.from("profiles").select("*").eq("id",s.user.id).single();
@@ -103,8 +128,52 @@ async function boot(s){
  $("cabBtn").hidden=$("siteBtn").hidden=!isB();$("addBtn").hidden=!isS();
  await load();if(!timer)timer=setInterval(()=>load(true),20000);
 }
-$("gl").onclick=()=>sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:location.origin+location.pathname}});
+$("gl").onclick=async()=>{try{const{error}=await sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:AUTH_REDIRECT_URL}});if(error)showAuthMessage(error.message)}catch(error){showAuthMessage(error.message||"Не удалось войти через Google")}};
 $("lo").onclick=$("out").onclick=()=>sb.auth.signOut();
+$("modeSwitch").onclick=()=>setAuthMode(authMode==="login"?"register":"login");
+$("authForm").onsubmit=async e=>{
+ e.preventDefault();
+ const email=$("authEmail").value.trim(),password=$("authPassword").value;
+ if(authMode==="register"&&!$("authName").value.trim()){showAuthMessage("Укажите имя");return}
+ $("authSubmit").disabled=true;
+ try{
+  if(authMode==="register"){
+   const{error}=await sb.auth.signUp({email,password,options:{data:{name:$("authName").value.trim()},emailRedirectTo:AUTH_REDIRECT_URL}});
+   if(error)showAuthMessage(error.message);
+   else showAuthMessage("Регистрация принята. Заявка ожидает подтверждения команды «Культура Заноса». Если подтверждение email включено, проверьте почту.",true);
+  }else{
+   const{error}=await sb.auth.signInWithPassword({email,password});
+   if(error)showAuthMessage(error.message);
+  }
+ }catch(error){showAuthMessage(error.message||"Не удалось выполнить вход")}
+ finally{$("authSubmit").disabled=false}
+};
+$("forgotBtn").onclick=()=>{$("authPanel").hidden=true;$("resetPanel").hidden=false;$("resetEmail").value=$("authEmail").value.trim();$("resetMessage").textContent="";$("wait").textContent="Сброс пароля"};
+$("resetBack").onclick=()=>{$("resetPanel").hidden=true;$("authPanel").hidden=false;$("wait").textContent="";$("resetMessage").textContent=""};
+$("resetPanel").onsubmit=async e=>{
+ e.preventDefault();
+ const email=$("resetEmail").value.trim(),button=$("resetPanel").querySelector('button[type="submit"]');
+ button.disabled=true;
+ try{
+  const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:AUTH_REDIRECT_URL});
+  $("resetMessage").textContent=error?error.message:"Если аккаунт с таким адресом существует, на почту отправлена ссылка для сброса пароля.";
+  $("resetMessage").className="auth-message"+(error?"":" ok");
+ }catch(error){$("resetMessage").textContent=error.message||"Не удалось отправить ссылку для сброса"}
+ finally{button.disabled=false}
+};
+$("recoveryPanel").onsubmit=async e=>{
+ e.preventDefault();
+ const password=$("newPassword").value;
+ if(password!==$("confirmPassword").value){showAuthMessage("Пароли не совпадают");$("recoveryPanel").hidden=false;return}
+ const button=$("recoveryPanel").querySelector('button[type="submit"]');button.disabled=true;
+ try{
+  const{error}=await sb.auth.updateUser({password});
+  if(error){showAuthMessage(error.message);return}
+  showAuthMessage("Пароль изменён.",true);$("recoveryPanel").hidden=true;
+  await boot(recoverySession);
+ }catch(error){showAuthMessage(error.message||"Не удалось изменить пароль")}
+ finally{button.disabled=false}
+};
 
 async function load(auto){
  if(!me)return;
